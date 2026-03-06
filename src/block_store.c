@@ -10,6 +10,11 @@
 // remove it before you submit. Just allows things to compile initially.
 #define UNUSED(x) (void)(x)
 
+struct block_store {
+	uint8_t data[BLOCK_STORE_NUM_BLOCKS][BLOCK_SIZE_BYTES];
+	bitmap_t *fbm;
+};
+
 block_store_t *block_store_create()
 {
 	return NULL;
@@ -84,3 +89,4 @@ size_t block_store_serialize(const block_store_t *const bs, const char *const fi
 	UNUSED(filename);
 	return 0;
 }
+
