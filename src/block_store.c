@@ -13,16 +13,49 @@
 struct block_store {
 	uint8_t data[BLOCK_STORE_NUM_BLOCKS][BLOCK_SIZE_BYTES];
 	bitmap_t *fbm;
+        uint8_t *data_blocks;
+        bitmap_t *fbm;
 };
 
 block_store_t *block_store_create()
 {
-	return NULL;
+        block_store_t *bs = malloc(sizeof(block_store_t));
+        if (!bs) {
+                return NULL;
+        }
+
+        bs->data_blocks = calloc(BLOCK_STORE_NUM_BLOCKS, BLOCK_SIZE_BYTES);
+        if (!bs->data_blocks) {
+                free(bs);
+                return NULL;
+        }
+
+        bs->fbm = bitmap_overlay(BITMAP_SIZE_BITS, bs->data_blocks + (BITMAP_START_BLOCK * BLOCK_SIZE_BYTES));
+        if (!bs->fbm) {
+                free(bs->data_blocks);
+                free(bs);
+                return NULL;
+        }
+
+        for (size_t i = 0; i < BITMAP_NUM_BLOCKS; i++) {
+                bitmap_set(bs->fbm, BITMAP_START_BLOCK + i);
+        }
+
+        return bs;
 }
 
 void block_store_destroy(block_store_t *const bs)
 {
-	UNUSED(bs);
+        if (!bs) {
+                return;
+        }
+
+        if (bs->fbm) {
+                bitmap_destroy(bs->fbm);
+        }
+
+        free(bs->data_blocks);
+        free(bs);
 }
 
 size_t block_store_allocate(block_store_t *const bs)
