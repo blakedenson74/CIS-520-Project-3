@@ -12,7 +12,6 @@
 
 struct block_store {
 	uint8_t data[BLOCK_STORE_NUM_BLOCKS][BLOCK_SIZE_BYTES];
-	bitmap_t *fbm;
         uint8_t *data_blocks;
         bitmap_t *fbm;
 };
