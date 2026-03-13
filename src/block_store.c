@@ -57,10 +57,21 @@ void block_store_destroy(block_store_t *const bs)
         free(bs);
 }
 
+
+// Finds the first free block using the bitmap, marks it as used, and returns the block id
 size_t block_store_allocate(block_store_t *const bs)
 {
-	UNUSED(bs);
-	return 0;
+        if (!bs) {
+                return SIZE_MAX;
+        }
+
+        size_t block_id = bitmap_ffz(bs->fbm);
+        if (block_id == SIZE_MAX) {
+                return SIZE_MAX;
+        }
+
+        bitmap_set(bs->fbm, block_id);
+        return block_id;
 }
 
 bool block_store_request(block_store_t *const bs, const size_t block_id)
