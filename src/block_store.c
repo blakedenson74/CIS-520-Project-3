@@ -74,11 +74,24 @@ size_t block_store_allocate(block_store_t *const bs)
         return block_id;
 }
 
+// Attempts to allocate the requested block, returning true if successful and false otherwise. 
 bool block_store_request(block_store_t *const bs, const size_t block_id)
 {
-	UNUSED(bs);
-	UNUSED(block_id);
-	return false;
+	if (!bs) {
+                return false;
+        }
+
+        if (block_id >= BLOCK_STORE_NUM_BLOCKS) {
+                return false;
+        }
+
+        if (bitmap_test(bs->fbm, block_id)) {
+                return false;
+        }
+
+        bitmap_set(bs->fbm, block_id);
+
+        return true;
 }
 
 // Marks a given block as free in the bitmap
