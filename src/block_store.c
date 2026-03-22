@@ -81,10 +81,18 @@ bool block_store_request(block_store_t *const bs, const size_t block_id)
 	return false;
 }
 
+// Marks a given block as free in the bitmap
 void block_store_release(block_store_t *const bs, const size_t block_id)
 {
-	UNUSED(bs);
-	UNUSED(block_id);
+	if (!bs) {
+		return;
+	}
+
+	if (block_id >= BLOCK_STORE_NUM_BLOCKS) {
+		return;
+	}
+
+	bitmap_reset(bs->fbm, block_id);
 }
 
 size_t block_store_get_used_blocks(const block_store_t *const bs)
@@ -99,9 +107,10 @@ size_t block_store_get_free_blocks(const block_store_t *const bs)
 	return 0;
 }
 
+// Returns the number of blocks in the block store
 size_t block_store_get_total_blocks()
 {
-	return 0;
+	return BLOCK_STORE_NUM_BLOCKS;
 }
 
 size_t block_store_read(const block_store_t *const bs, const size_t block_id, void *buffer)
