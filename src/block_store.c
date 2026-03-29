@@ -108,10 +108,14 @@ void block_store_release(block_store_t *const bs, const size_t block_id)
 	bitmap_reset(bs->fbm, block_id);
 }
 
+// returns number of used blocks
 size_t block_store_get_used_blocks(const block_store_t *const bs)
 {
-	UNUSED(bs);
-	return 0;
+	if (!bs) {
+        return SIZE_MAX;
+    }
+
+    return bitmap_total_set(bs->fbm);
 }
 
 // returns number of free blocks (total blocks - used blocks)
