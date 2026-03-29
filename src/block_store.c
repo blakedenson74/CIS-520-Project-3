@@ -135,10 +135,17 @@ size_t block_store_get_total_blocks()
 
 size_t block_store_read(const block_store_t *const bs, const size_t block_id, void *buffer)
 {
-	UNUSED(bs);
-	UNUSED(block_id);
-	UNUSED(buffer);
-	return 0;
+	if (!bs || !buffer) {
+		return 0;
+	}
+	if (block_id >= BLOCK_STORE_NUM_BLOCKS) {
+		return 0;
+	}
+	uint8_t *buf = (uint8_t *)buffer;
+	for (size_t i = 0; i < BLOCK_SIZE_BYTES; i++) {
+		buf[i] = bs->data_blocks[block_id * BLOCK_SIZE_BYTES + i];
+	}
+	return BLOCK_SIZE_BYTES;
 }
 
 size_t block_store_write(block_store_t *const bs, const size_t block_id, const void *buffer)
