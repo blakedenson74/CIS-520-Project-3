@@ -114,10 +114,13 @@ size_t block_store_get_used_blocks(const block_store_t *const bs)
 	return 0;
 }
 
+// returns number of free blocks (total blocks - used blocks)
 size_t block_store_get_free_blocks(const block_store_t *const bs)
 {
-	UNUSED(bs);
-	return 0;
+        if (!bs) {
+                return SIZE_MAX;
+        }
+        return BLOCK_STORE_NUM_BLOCKS - bitmap_total_set(bs->fbm);
 }
 
 // Returns the number of blocks in the block store
