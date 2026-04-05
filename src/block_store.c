@@ -133,6 +133,7 @@ size_t block_store_get_total_blocks()
 	return BLOCK_STORE_NUM_BLOCKS;
 }
 
+// Reads the contents of a block and returns the number of bytes read
 size_t block_store_read(const block_store_t *const bs, const size_t block_id, void *buffer)
 {
 	if (!bs || !buffer) {
@@ -148,12 +149,23 @@ size_t block_store_read(const block_store_t *const bs, const size_t block_id, vo
 	return BLOCK_SIZE_BYTES;
 }
 
+// Writes the contents of a buffer to a block
 size_t block_store_write(block_store_t *const bs, const size_t block_id, const void *buffer)
 {
-	UNUSED(bs);
-	UNUSED(block_id);
-	UNUSED(buffer);
-	return 0;
+	if (!bs || !buffer) {
+		return 0;
+	}
+	if (block_id >= BLOCK_STORE_NUM_BLOCKS) {
+		return 0;
+	}
+
+	const uint8_t *buf = (const uint8_t *)buffer;
+
+	for (size_t i = 0; i < BLOCK_SIZE_BYTES; i++) {
+		bs->data_blocks[block_id * BLOCK_SIZE_BYTES + i] = buf[i];
+	}
+
+	return BLOCK_SIZE_BYTES;
 }
 
 block_store_t *block_store_deserialize(const char *const filename)
