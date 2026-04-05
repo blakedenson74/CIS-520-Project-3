@@ -174,10 +174,22 @@ block_store_t *block_store_deserialize(const char *const filename)
 	return NULL;
 }
 
+// Serializes the contents of the block_store_t bs to the file filename
 size_t block_store_serialize(const block_store_t *const bs, const char *const filename)
 {
-	UNUSED(bs);
-	UNUSED(filename);
-	return 0;
+	if (!bs || !filename) {
+    	return 0;
+  	}
+  
+  	FILE *file = fopen(filename, "wb");
+  	if (!file) {
+    	return 0;
+  	}
+  
+  	size_t bytes_written = fwrite(bs->data_blocks, 1, BLOCK_STORE_NUM_BYTES, file);
+  
+  	fclose(file);
+  
+  	return bytes_written;
 }
 
