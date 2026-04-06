@@ -1,5 +1,9 @@
 #include <stdio.h>
 #include <stdint.h>
+#include <fcntl.h>
+#include <unistd.h>
+#include <errno.h>
+
 
 #include "bitmap.h"
 #include "block_store.h"
@@ -170,8 +174,35 @@ size_t block_store_write(block_store_t *const bs, const size_t block_id, const v
 
 block_store_t *block_store_deserialize(const char *const filename)
 {
-	UNUSED(filename);
-	return NULL;
+	if(!filename){
+		return NULL;
+	}
+
+	int fd = open(filename, O_RDONLY);
+	if(fd < 0){
+		return NULL;
+	}
+
+	block_store_t *bs = block_store_create();
+	if(!bs){
+		close(fd);
+		return NULL;
+	}
+
+	ssize_t bytes_read = read(fd, bs->data_blocks, BLOCK_STORE_NUM_BYTES);
+	close(fd);
+
+	if(bytes_read < 0){
+		block_store_destroy(bs);
+		return NULL;
+	}
+
+	if((size_t)bytes_read < BLOCK_STORE_NUM_BYTES){
+		block_store_destroy(bs);
+		return NULL;
+	}
+
+	return bs;
 }
 
 // Serializes the contents of the block_store_t bs to the file filename
